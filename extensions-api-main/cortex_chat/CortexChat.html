@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cortex Chat Extension</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Extensions Library (this will be hosted on a CDN eventually) -->
+    <script src="../lib/tableau.extensions.1.latest.js"></script>
+    
+    <!-- Extension sript + style-->
+    <script src="CortexChat.js"></script>
+    <link rel="stylesheet" href="style.css">
+    
+  </head>
+
+  <body>
+    <div class="chat-header">
+        <img src="cyberark-logo.svg" alt="CyberArk Logo" style="height: 100%;" />
+        <span class="bot-title" style="margin-left: 10px;">CyberArk Analyst</span>
+
+  </div>
+    <div class="chat-container">
+      
+      <div class="chat-messages" id="chatMessages">
+         <!-- Filled in dynamically.--> 
+      </div>
+
+      <!-- Input form -->
+      <form class="chat-input-form" id="chatInputForm">
+          <input type="text" id="userInput" placeholder="Type your message here..." autocomplete="off">
+          <button type="submit">
+              <i class="fas fa-paper-plane"></i>
+          </button>
+      </form>
+    </div>
+  <div class="toast" id="toast"></div>
+  </body>
+</html>

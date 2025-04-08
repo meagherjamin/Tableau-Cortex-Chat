@@ -1,0 +1,405 @@
+body, html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 10px;
+    text-align: left;
+}
+
+.bot-title {
+    font-size: 16px; /* Smaller font size */
+    font-weight: normal;
+    color: #333; /* Dark text color */
+    margin: 0;
+    
+    box-sizing: border-box;
+    width:100%;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px); /* Adjust based on header */
+    overflow: hidden;
+  }
+  
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .chat-input-form {
+    display: flex;
+    padding: 0.75rem 1rem;
+    z-index: 1;
+  }
+
+.chat-input-form input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 12px;
+    transition: border 0.3s ease;
+}
+
+.chat-input-form input:focus {
+    border-color: #0084ff;
+    box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.2);
+}
+
+.chat-input-form button {
+    margin-left: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: #026b95;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.chat-input-form button:hover {
+    background-color: #0077e6;
+}
+
+.chat-input-form button:active {
+    background-color: #0066cc;
+}
+
+#chatMessages {
+  padding-bottom: 100px; /* Adjust based on your input box height */
+  overflow-y: auto;
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+   max-width: 95%;
+}
+
+.bot-container {
+    align-self: flex-start;
+    max-width:95%;
+}
+
+.user-container {
+    align-self: flex-end;
+    max-width: 60%;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #4AC7F4;
+    font-size: 12px;
+    color: white;
+}
+
+.bot-message {
+    background-color: #e5e5ea;
+    font-size: 12px;
+    max-width: 100%;
+    color: black;
+}
+
+.feedback-buttons {
+    display: flex;
+    margin-top: 8px;
+    gap: 12px;
+}
+
+.feedback-button {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    opacity: 0.6;
+}
+
+.feedback-button:hover {
+    opacity: 1;
+}
+
+.feedback-button.active {
+    opacity: 1;
+}
+
+.feedback-button.up.active {
+    color: #4CAF50;
+}
+
+.feedback-button.down.active {
+    color: #F44336;
+}
+
+.feedback-button.copy.active {
+    color: #2196F3;
+}
+
+.feedback-box {
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px;
+    margin-top: 6px;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    z-index: 10;
+  }
+  
+  .feedback-header {
+    font-size: 16px;
+    font-weight: bold;
+    text-align:center;
+    color: #333; /* Dark text color */
+    margin-bottom: 10px; /* Spacing between header and textarea */
+}
+  
+  .feedback-box textarea {
+    width: 100%;
+    resize: vertical;
+    height: 60px;
+    margin-bottom: 6px;
+  }
+  
+  .feedback-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-end;
+  }
+  
+  .feedback-actions button {
+    padding: 2px 2px;
+    cursor: pointer;
+  }
+
+  .feedback-button.copyId {
+    display: flex;
+    align-items: center;
+}
+
+.feedback-button.copyId i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+.feedback-button.copyData {
+    display: flex;
+    align-items: center;
+}
+
+.feedback-button.copyData i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+/* Styling for suggestion bubbles */
+.suggestions-container {
+    margin-top: 10px;
+    display:flex;
+    align-items: flex-start;;
+    flex-direction:column;
+    gap:5px;
+}
+
+.suggestion-bubble {
+    /*background-color: #f1f1f1; /* Light gray for suggestion bubbles */
+    color: #333;
+    padding: 8px 15px; /* Smaller padding than chat bubbles */
+    border-radius: 20px; /* Rounded corners */
+    font-size: 12px; /* Smaller font size */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: 2px solid #d0d0d0; /* Darker border than the fill color */
+    display: inline-block; /* Allow width to shrink to the content */
+    max-width: 100%; /* Prevent bubbles from growing beyond container width */
+    cursor: pointer; /* Indicate that it's clickable */
+    transition: border-color 0.2s ease; /* Smooth transition for border color */
+}
+
+.suggestion-bubble:hover {
+    border-color: #3498db; /* Blue border on hover (similar to chat input) */
+    background-color: #e6f0ff; /* Light blue background on hover for better visibility */
+    
+}
+  
+
+.status-message {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+/* Toast notification for copy function */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    z-index: 2;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: none;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+.toast.hide {
+    opacity: 0;
+    transition: opacity 0.9s ease-out;
+}
+
+.loading-spinner {
+    font-size: 16px; /* Size the spinner */
+    color: #3498db; /* Blue color for the spinner */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+  
+/* Wrapper to allow horizontal scrolling for wide tables */
+.sql-table-container {
+    width: 100%;  /* Allow the table container to take up full available width */
+    overflow-x: auto; /* Enables horizontal scrolling when needed */
+    margin-top: 10px; /* Adds spacing between the table and other content */
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* Style for SQL table */
+.sql-table {
+    width: 100%;  /* Make the table take up the full width of the wrapper */
+    table-layout: auto; /* Allow the table layout to expand based on content */
+    border-collapse: collapse; /* Collapse the table borders into single lines */
+}
+
+/* Style for table headers */
+.sql-table th {
+    background-color: #e6f0ff; /* Light blue background for the header */
+    color: #333; /* Dark text color for readability */
+    padding: 10px;
+    border: 1px solid #ddd; /* Border around each cell */
+    text-align: left;
+    font-weight: bold; /* Make header text bold */
+}
+
+/* Style for table cells */
+.sql-table td {
+    padding: 8px 10px; /* Padding inside cells */
+    border: 1px solid #ddd; /* Border around each cell */
+    text-align: left;
+    background-color: #fff; /* White background for cells */
+}
+
+/* Add alternating row colors for better readability */
+.sql-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light gray background for even rows */
+}
+
+/* Highlight row on hover */
+.sql-table tr:hover {
+    background-color: #f1f1f1; /* Slightly darker background on hover */
+}
+
+/* Feedback Modal styles */
+.feedback-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.feedback-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    max-width: 90%;
+}
+
+.feedback-box h3.feedback-header {
+    margin: 0 0 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.feedback-box textarea {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.feedback-box .feedback-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.feedback-box .feedback-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.feedback-box .feedback-actions button.submit-feedback {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.feedback-box .feedback-actions button.cancel-feedback {
+    background-color: #f44336;
+    color: white;
+}
