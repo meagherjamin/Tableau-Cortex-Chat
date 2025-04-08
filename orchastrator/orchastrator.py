@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+from snowflake.snowpark import Session
+from snowflake.cortex import Complete
+
 temp_model_store = {
     "surveyModelID": {"name": "CSAT Surveys", "description": "Customer Satisfaction Surveys"},
     "supportModelID": {"name": "Support Cases", "description": "Support Chatbot"},
@@ -38,3 +41,6 @@ def get_model():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
