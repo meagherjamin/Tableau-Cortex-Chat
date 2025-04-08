@@ -1,4 +1,4 @@
-# CyberArk Cortex Chat
+# Tableau Cortex Chat
 
 ## Getting Started
 
