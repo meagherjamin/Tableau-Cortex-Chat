@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from snowflake.snowpark import Session
-from snowflake.cortex import Complete
+# from snowflake.snowpark import Session
+# from snowflake.cortex import Complete
 
 temp_model_store = {
     "surveyModelID": {"name": "CSAT Surveys", "description": "Customer Satisfaction Surveys"},
