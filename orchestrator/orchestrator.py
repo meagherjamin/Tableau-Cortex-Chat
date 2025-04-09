@@ -3,11 +3,15 @@ from flask_cors import CORS
 
 # from snowflake.snowpark import Session
 # from snowflake.cortex import Complete
-
-temp_model_store = {
-    "surveyModelID": {"name": "CSAT Surveys", "description": "Customer Satisfaction Surveys"},
-    "supportModelID": {"name": "Support Cases", "description": "Support Chatbot"},
-}
+#example model registry. Eventually store these in snowflake.
+modelRegistry_dummy = [
+        { "id": "test1", "name": "Test 1", "description": "Description for Test 1", "publishDate": "2023-03-01 12:00:00" },
+        { "id": "test2", "name": "Test 2", "description": "Description for Test 2", "publishDate": "2023-03-02 12:00:00" },
+        { "id": "test3", "name": "Test 3", "description": "Description for Test 3", "publishDate": "2023-03-03 12:00:00" },
+        { "id": "test2dup1", "name": "Test 2", "description": "Much longer description, detailing the semantic models used and the last update date.", "publishDate": "2023-03-04 12:00:00" },
+        { "id": "test2dup2", "name": "Test 2", "description": "Description for Test 2", "publishDate": "2023-03-05 12:00:00" },
+        { "id": "test2dup3", "name": "Test 2", "description": "Description for Test 2", "publishDate": "2023-03-06 12:00:00" }
+    ]
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -30,14 +34,12 @@ def feedback():
     print("Received feedback:", data)
     return data['messageId'], 204  # No content, but successful
 
-@app.route('/model', methods=['POST'])
-def get_model():
-    data = request.get_json()
-    modelid = data.get("modelid")
-    if modelid and modelid in temp_model_store:
-        return jsonify(temp_model_store[modelid])
+@app.route('/modelRegistry', methods=['POST'])
+def modelRegistry():
+    if modelRegistry:
+        return jsonify(modelRegistry_dummy)
     else:
-        return jsonify({"error": "Model not found"}), 404
+        return jsonify([]), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

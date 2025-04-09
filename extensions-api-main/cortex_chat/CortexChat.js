@@ -8,45 +8,62 @@ $(document).ready(function() {
     let currentUser = ''; //read from username parameter, the tableau user (email)
     let feedbackSubmitted = new Set(); //tracks feedback on messages.
     let chatHistory = []; //holds the chat history for the session.
-    let model_id = ''; //holds the model id from the dashboard parameter.
-    let model_data = {}; //holds the model data looked up from the Orchastrator.
 
     //Orchastrator connection info
+    //TODO have a better way to configure this.
     let orchastratorAddress = 'http://127.0.0.1:5000/'
     
     // Initialize Tableau Extension
-    tableau.extensions.initializeAsync().then(function() {
+    tableau.extensions.initializeAsync({'configure': configure}).then(function() {
 
         console.log("Extension initialized");
-        // Add a status message to chat stream
         addStatusMessage("Extension connected to Tableau");
+
+        // Check if the model has been saved to settings from configuration. If not, force the user to select a model.
+        var savedModelSetting = tableau.extensions.settings.get("model");
+        if (!savedModelSetting) {
+            console.log("Model not configured, showing modal.");
+            showModelNotConfiguredModal();
+        } else {
+            try {
+                var modelObj = JSON.parse(savedModelSetting);
+                $(".bot-title").text(modelObj.name);
+                // If the modal exists, remove it because we have a valid configuration.
+                if ($("#modelNotConfiguredModal").length > 0) {
+                    $("#modelNotConfiguredModal").modal('hide');
+                    $("#modelNotConfiguredModal").remove();
+                    $(".modal-backdrop").remove();
+                }
+            } catch (e) {
+                console.error("Error parsing saved model: ", e);
+                showModelNotConfiguredModal();
+            }
+        }
+        //add event listener for setting changes.
+        tableau.extensions.settings.addEventListener(tableau.TableauEventType.SettingsChanged, (settingsEvent) => {
+        console.log("Settings changed:", settingsEvent.newSettings);
+        if (tableau.extensions.settings.get("model")) {
+                if ($("#modelNotConfiguredModal").length > 0) {
+                    $("#modelNotConfiguredModal").modal('hide');
+                    $("#modelNotConfiguredModal").remove();
+                    $(".modal-backdrop").remove();
+                }
+        }
+        });
   
         //Get the dashboard object
         let dashboard = tableau.extensions.dashboardContent.dashboard;
-        //Gather reserved parameter values, username and model_id from the dashboard
-        //TODO: update model_id to pull from configuration -> settings, not a parameter.
+        //Gather reserved parameter values, username.
         tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
             parameters.forEach(function (p) {
               if (p.name === "username") {
                 currentUser = p.currentValue.formattedValue;
                 addStatusMessage(`Username: ${currentUser}`);
               }
-              if (p.name === "model_id") {
-                //update this to use dashboard config, not parameters..
-                model_id = p.currentValue.formattedValue;
-                lookupModelId(model_id).then(response => {
-                    if (response) {
-                        model_data = response;
-                        console.log("Model data:", model_data);
-                        $('.bot-title').text(model_data.name);
-                    } else {
-                        addStatusMessage("Failed to retrieve model data");
-                    }
-                });
-              }
             });
         });
         
+        //TODO store filters in a better way..
         refreshDashboardFilters();
         refreshDashboardDataSources();
   
@@ -61,6 +78,34 @@ $(document).ready(function() {
         // Display error
         addStatusMessage("Error initializing: " + err.toString());
     });
+    //Configuration function.
+    const defaultModelId = '';
+    async function configure() {
+        const popupURL = './config.html';
+        let dialogStyle = tableau.DialogStyle.Modal;
+        tableau.extensions.ui.displayDialogAsync(popupURL, defaultModelId, { height: 550, width: 500, dialogStyle })
+          .then((closePayload) => {
+            console.log('Configuration Dialog closed with message: ' + closePayload);
+                // Retrieve the saved model from settings
+                const savedModelSetting = tableau.extensions.settings.get("model");
+                if (savedModelSetting) {
+                    try {
+                        var modelObj = JSON.parse(savedModelSetting);
+                        $(".bot-title").text(modelObj.name);
+                        addStatusMessage("Saved Model: " + modelObj.name);
+                    } catch(e) {
+                        console.error("Error parsing saved model:", e);
+                        addStatusMessage("Error reading saved model configuration");
+                    }
+                } else {
+                    addStatusMessage("Model not set.");
+                }
+
+          }).catch((err) => {
+            console.error("Dialog closed with error: " + err.toString());
+          });
+    }
+
   
     // Handle user chat input submission
     $("#chatInputForm").on("submit", function(e) {
@@ -255,11 +300,11 @@ $(document).ready(function() {
         }
     });
   
-    //send chat request to orchastrator
+    //send chat request to orchestrator
     //TODO Sanitize user input.
     function sendChatRequest(latest_msg, messageId) {
         const filtersToSend = getFlatFilterList();
-        //latest_msg is only for testing. We will send the full chat context to the orchastrator.
+        //latest_msg is only for testing. We will send the full chat context to the orchestrator.
         latest_msg_text = latest_msg.message.content[0].text;
         //what the request body will eventually look like.
         //TODO implement dashboard source in request for monitoring.
@@ -577,26 +622,7 @@ $(document).ready(function() {
         updateBotMessage(messageId, response);
       }
 
-      //Orchastrator Request. Looks up model info like Name and description. 
-      async function lookupModelId(model_id) {
-        try {
-            const response = await fetch(orchastratorAddress + '/model', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ modelid: model_id })
-            });
-            if (!response.ok) {
-                console.error("Failed to get model info");
-                return null;
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error with model info:", error);
-            return null;
-        }
-    }
-    //Orchastrator Request. Sends feedback to the feedback endpoint.
+    //Orchestrator Request. Sends feedback to the feedback endpoint.
     function submitFeedback(messageId, type, text) {
 
         fetch(orchastratorAddress+'/feedback', {
@@ -737,10 +763,10 @@ $(document).ready(function() {
                 }
             }
             appendChatHistory(messageId, message_obj);
-            
+            //add loading message to bot.
             addLoadingBotMessage(messageId);
 
-            //simulate delay
+            //simulate delay for testing.
             const randomInterval = 1500;
             setTimeout(function() {
                 sendChatRequest(message_obj, messageId); //send chat reqeust handles updating the view.
@@ -759,7 +785,6 @@ $(document).ready(function() {
     }
   
     //updates the bots message when response is recieved.
-    //TODO: implement streaming responses
     function updateBotMessage(messageId, response) {
         
         const container = $(`.message-container[data-message-id="${messageId}"]`);
@@ -772,9 +797,7 @@ $(document).ready(function() {
         //loop through message content. 
         response.message.content.forEach(contentItem => {
             if (contentItem.type === "text") {
-                
-                // If it's text, append the text to messageText
-                //TODO : implement clean formating for multiple user messages.
+                //TODO : implement clean formating for multiple user messages. Right now, all text is appended together.
                 messageText += contentItem.text + " "; // Add space to separate multiple texts
             } else if (contentItem.type === "suggestions") {
                 
@@ -890,5 +913,33 @@ $(document).ready(function() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
         $("#chatMessages").animate({ scrollTop: chatMessages.scrollHeight }, 200);
     }
+
+    //shows modal if the model is not chosen from the configuration.
+    function showModelNotConfiguredModal() {
+        // Check if the modal already exists
+        if ($("#modelNotConfiguredModal").length === 0) {
+            var modalHtml = `
+            <div class="modal fade" id="modelNotConfiguredModal" tabindex="-1" role="dialog" aria-labelledby="modelNotConfiguredModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title" id="modelNotConfiguredModalLabel">Configuration Required</h4>
+                  </div>
+                  <div class="modal-body">
+                    Please select a model from the configuration menu to use the extension.
+                  </div>
+                </div>
+              </div>
+            </div>
+            `;
+            $("body").append(modalHtml);
+        }
+        // Open the modal with a static backdrop so it cannot be dismissed by the user
+        $("#modelNotConfiguredModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+    }
       
     });
+
